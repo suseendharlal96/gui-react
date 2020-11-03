@@ -3,9 +3,9 @@ import Dropzone from "./Dropzone";
 import "./Items.css";
 const Items = () => {
   const [items, setItems] = useState([
-    { id: "1", type: "aside" },
-    { id: "2", type: "input" },
-    { id: "3", type: "button" },
+    { id: "1", type: "input" },
+    { id: "2", type: "button" },
+    { id: "3", type: "textarea" },
   ]);
 
   const [change, isChange] = useState();
@@ -13,10 +13,13 @@ const Items = () => {
   const [arr, setArr] = useState([]);
 
   useEffect(() => {
-    if (JSON.parse(localStorage.getItem("data"))) {
-      setArr(JSON.parse(localStorage.getItem("data")));
+    console.log(JSON.parse(localStorage.getItem("data")));
+    if (
+      JSON.parse(localStorage.getItem("data")) &&
+      JSON.parse(localStorage.getItem("data")).length > 0
+    ) {
     }
-  }, []);
+  });
 
   useEffect(() => {
     setArr(JSON.parse(localStorage.getItem("data")));
@@ -90,14 +93,16 @@ const Items = () => {
 
       let cssProp = {};
       cssProp = {
-        className: `dropped ${offset[2]}`,
+        className: `dropped ${Math.random()}`,
         type: offset[3],
         style: {
           left: dm[parseInt(offset[2])].style.left,
           top: dm[parseInt(offset[2])].style.top,
         },
       };
-      const copy = arr;
+      const copy = JSON.parse(localStorage.getItem("data"))
+        ? JSON.parse(localStorage.getItem("data"))
+        : arr;
 
       copy.push(cssProp);
       console.log(copy);
@@ -125,8 +130,12 @@ const Items = () => {
           top: dm[parseInt(offset[2])].style.top,
         },
       };
-      const copy = arr;
+      const copy = JSON.parse(localStorage.getItem("data"))
+        ? JSON.parse(localStorage.getItem("data"))
+        : arr;
+      console.log("newcopy", copy);
       const index = copy.findIndex((c) => c.className === offset[4]);
+      console.log(index);
       if (index !== -1) {
         copy[index] = cssProp;
         console.log(copy);
@@ -168,41 +177,31 @@ const Items = () => {
           },
           "Button"
         );
-      case "aside":
-        return createElement(
-          type,
-          {
-            className: `dragme ${index}`,
-            draggable: "true",
-            "data-item": index,
-            onClick: (e) => handleClick(e),
-          },
-          "Container"
-        );
+      case "textarea":
+        return createElement(type, {
+          className: `dragme ${index}`,
+          draggable: "true",
+          "data-item": index,
+        });
     }
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-evenly",
-        }}
-      >
-        {items.map((item, index) => (
-          <React.Fragment key={item.id}>
-            {renderElement(item.type, index)}
-          </React.Fragment>
-        ))}
+    <div className="main-container">
+      <div style={{ width: "100%" }}>
+        <h2>Tools</h2>
+        <div className="side-panel">
+          {items.map((item, index) => (
+            <React.Fragment key={item.id}>
+              {renderElement(item.type, index)}
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+      <div className="drop-zone">
+        <Dropzone droppedItems={arr} />
       </div>
       {/* {JSON.stringify(arr, null, 2)} */}
-      <Dropzone droppedItems={arr} />
     </div>
   );
 };

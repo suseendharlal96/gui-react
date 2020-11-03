@@ -7,8 +7,9 @@ const Dropzone = ({ droppedItems }) => {
     switch (item.type) {
       case "input":
         return React.createElement(item.type, {
-          className: `${item.className}${index}`,
+          className: `${item.className}`,
           draggable: "true",
+
           style: {
             left: item.style.left,
             right: item.style.right,
@@ -22,7 +23,7 @@ const Dropzone = ({ droppedItems }) => {
         return React.createElement(
           item.type,
           {
-            className: `${item.className}${index}`,
+            className: `${item.className}`,
             draggable: "true",
             style: {
               left: item.style.left,
@@ -35,28 +36,26 @@ const Dropzone = ({ droppedItems }) => {
           },
           "Button"
         );
-      case "aside":
-        return React.createElement(
-          item.type,
-          {
-            className: `${item.className}${index}`,
-            draggable: "true",
-            style: {
-              left: item.style.left,
-              right: item.style.right,
-              top: item.style.top,
-              bottom: item.style.bottom,
-              position: "relative",
-            },
-            "data-item": index,
+      case "textarea":
+        return React.createElement(item.type, {
+          className: `${item.className}`,
+          draggable: "true",
+          style: {
+            type: item.type,
+            left: item.style.left,
+            right: item.style.right,
+            top: item.style.top,
+            bottom: item.style.bottom,
+            position: "relative",
           },
-          "Container"
-        );
+          "data-item": index,
+        });
     }
   };
 
   return (
-    <div id="div1" className="drop-zone">
+    <React.Fragment>
+      <h2>Drop Zone</h2>
       {droppedItems &&
         droppedItems.length > 0 &&
         droppedItems.map((item, index) => {
@@ -66,7 +65,7 @@ const Dropzone = ({ droppedItems }) => {
             </React.Fragment>
           );
         })}
-    </div>
+    </React.Fragment>
   );
 };
 export default Dropzone;

@@ -1,8 +1,19 @@
+.main-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.side-panel {
+  display: flex;
+  justify-content: space-evenly;
+  width: 100%;
+  align-items: center;
+}
+
 .dragme {
   position: relative;
-  /* top: 40%; */
-  left: 0%;
-  padding-bottom: 2%;
 }
 
 aside {

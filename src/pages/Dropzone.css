@@ -1,6 +1,7 @@
-#div1 {
-  width: 100%;
+.drop-zone {
   height: 500px;
+  width: 100%;
   padding: 10px;
-  border: 1px solid #aaaaaa;
+  border: 1px solid #000000;
+  position: relative;
 }
