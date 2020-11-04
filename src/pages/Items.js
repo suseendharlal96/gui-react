@@ -1,73 +1,84 @@
+// global imports
 import React, { useEffect, useState, createElement } from "react";
+
+// local imports
 import Dropzone from "./Dropzone";
 import "./Items.css";
+
 const Items = () => {
+  // initializing the type of elements needed
   const [items, setItems] = useState([
     { id: "1", type: "input" },
     { id: "2", type: "button" },
-    { id: "3", type: "textarea" },
+    { id: "3", type: "h2" },
+    { id: "4", type: "textarea" },
   ]);
 
-  const [change, isChange] = useState();
-
-  const [arr, setArr] = useState([]);
-
-  useEffect(() => {
-    console.log(JSON.parse(localStorage.getItem("data")));
-    if (
-      JSON.parse(localStorage.getItem("data")) &&
-      JSON.parse(localStorage.getItem("data")).length > 0
-    ) {
-    }
-  });
-
-  useEffect(() => {
-    setArr(JSON.parse(localStorage.getItem("data")));
-  }, [change]);
-
+  /* assigning the necessary events to the items and drop-zone
+  (after initial component render)*/
   useEffect(() => {
     const dm = document.getElementsByClassName("dragme");
+
     for (let i = 0; i < dm.length; i++) {
+      // assigning 'dragstart' event on the items
       dm[i].addEventListener("dragstart", drag_start, false);
+
+      // assigning 'dragover' event on the drop-zone div
       document
         .getElementsByClassName("drop-zone")[0]
         .addEventListener("dragover", drag_over, false);
+
+      // assigning 'drop' event on the drop-zone div
       document
         .getElementsByClassName("drop-zone")[0]
         .addEventListener("drop", drop, false);
     }
   }, []);
 
+  const [change, isChange] = useState();
+
+  // initializing the items to be dropped on drop-zone
+  const [droppedItems, setDroppedItems] = useState([]);
+
+  // keeping the items in sync with localstorage whenever an item is being dropped
   useEffect(() => {
-    console.log(1);
+    setDroppedItems(JSON.parse(localStorage.getItem("data")));
+  }, [change]);
+
+  /* constantly keeping track of elements on drop-zone 
+  and assigning the necessary DOM events*/
+  useEffect(() => {
     if (document.getElementsByClassName("dropped")) {
       const drop = document.getElementsByClassName("dropped");
       for (let i = 0; i < drop.length; i++) {
+        // assigning 'dragstart' event on the items already on drop-zone
         drop[i].addEventListener("dragstart", drag_start, false);
-        document
-          .getElementsByClassName("drop-zone")[0]
-          .addEventListener("dragover", drag_over, false);
-        document
-          .getElementsByClassName("drop-zone")[0]
-          .addEventListener("drop", drop, false);
       }
     }
   });
 
   function drag_start(event) {
-    console.log(event);
+    // getting the style properties of the actively-dragged element
     const style = window.getComputedStyle(event.target, null);
+
+    /* setting the dragged element properties on 'dataTransfer' so that 
+    it can be utilized while being dropped*/
     event.dataTransfer.setData(
       "text/plain",
       parseInt(style.getPropertyValue("left"), 10) -
+        // clientX
         event.clientX +
         "," +
+        // clientY
         (parseInt(style.getPropertyValue("top"), 10) - event.clientY) +
         "," +
+        // unique attribute name
         event.target.getAttribute("data-item") +
         "," +
+        // wheather its input/button etc.
         event.target.localName +
         "," +
+        // element's classname
         event.target.className
     );
   }
@@ -79,18 +90,20 @@ const Items = () => {
 
   function drop(event) {
     event.preventDefault();
-    // console.log("e", event);
+    // retrieving the element's properties which was previously set on 'dragstart'
     const offset = event.dataTransfer.getData("text/plain").split(",");
-    console.log(offset);
 
     if (offset[4].search("dropped") === -1) {
+      // Condition 1 : Elements dragged from original place to drop-zone
       const dm = document.getElementsByClassName("dragme");
-      console.log(dm);
+
+      // getting the data of how much the element has moved
       dm[parseInt(offset[2])].style.left =
         event.clientX + parseInt(offset[0], 10) + "px";
       dm[parseInt(offset[2])].style.top =
         event.clientY + parseInt(offset[1], 10) + "px";
 
+      // creating a new object to be dropped on drop-zone
       let cssProp = {};
       cssProp = {
         className: `dropped ${Math.random()}`,
@@ -102,20 +115,26 @@ const Items = () => {
       };
       const copy = JSON.parse(localStorage.getItem("data"))
         ? JSON.parse(localStorage.getItem("data"))
-        : arr;
+        : droppedItems;
 
       copy.push(cssProp);
-      console.log(copy);
-      setArr(copy);
-      // arr.push(cssProp);
+      // populating droppedItems
+      setDroppedItems(copy);
+
+      // populating localstorage after successful drop
       localStorage.setItem("data", JSON.stringify(copy));
-      console.log("local", JSON.parse(localStorage.getItem("data")));
+
+      // triggering the hook which was keeping the items in sync with localstorage
       isChange(new Date().getTime());
+
+      // setting the item to its original position from where it was taken
       dm[parseInt(offset[2])].style.left = "0px";
       dm[parseInt(offset[2])].style.top = "0px";
     } else {
+      // Condition 2 : Elements dragged & dropped within drop-zone
       const dm = document.getElementsByClassName("dropped");
-      console.log(dm);
+
+      // getting the data of how much the element has moved within the drop-zone
       dm[parseInt(offset[2])].style.left =
         event.clientX + parseInt(offset[0], 10) + "px";
       dm[parseInt(offset[2])].style.top =
@@ -132,16 +151,19 @@ const Items = () => {
       };
       const copy = JSON.parse(localStorage.getItem("data"))
         ? JSON.parse(localStorage.getItem("data"))
-        : arr;
-      console.log("newcopy", copy);
+        : droppedItems;
+
+      /* finding the element which has moved and updating that particular
+       element's property
+       */
       const index = copy.findIndex((c) => c.className === offset[4]);
-      console.log(index);
       if (index !== -1) {
         copy[index] = cssProp;
-        console.log(copy);
-        setArr(copy);
+        setDroppedItems(copy);
+
+        // updating localstorage
         localStorage.setItem("data", JSON.stringify(copy));
-        console.log("local", JSON.parse(localStorage.getItem("data")));
+        // triggering to keep in sync with localstorage
         isChange(new Date().getTime());
       }
     }
@@ -150,7 +172,6 @@ const Items = () => {
   }
 
   const handleChange = (e) => {
-    console.log(e);
   };
 
   const handleClick = () => {
@@ -158,6 +179,7 @@ const Items = () => {
   };
 
   const renderElement = (type, index) => {
+    // Rendering the type of element based on items array
     switch (type) {
       case "input":
         return createElement(type, {
@@ -176,6 +198,16 @@ const Items = () => {
             onClick: (e) => handleClick(e),
           },
           "Button"
+        );
+      case "h2":
+        return createElement(
+          type,
+          {
+            className: `dragme ${index}`,
+            draggable: "true",
+            "data-item": index,
+          },
+          "Large Text"
         );
       case "textarea":
         return createElement(type, {
@@ -199,9 +231,9 @@ const Items = () => {
         </div>
       </div>
       <div className="drop-zone">
-        <Dropzone droppedItems={arr} />
+        <Dropzone droppedItems={droppedItems} />
       </div>
-      {/* {JSON.stringify(arr, null, 2)} */}
+      {/* {JSON.stringify(droppedItems, null, 2)} */}
     </div>
   );
 };
