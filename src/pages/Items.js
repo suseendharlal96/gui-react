@@ -10,7 +10,7 @@ const Items = () => {
   const [items, setItems] = useState([
     { id: "1", type: "input" },
     { id: "2", type: "button" },
-    { id: "3", type: "h2" },
+    { id: "3", type: "h1" },
     { id: "4", type: "textarea" },
   ]);
 
@@ -171,7 +171,9 @@ const Items = () => {
     return false;
   }
 
-  const handleChange = (e) => {
+  const resetHandler = () => {
+    localStorage.setItem("data", null);
+    window.location.href = "/";
   };
 
   const handleClick = () => {
@@ -186,7 +188,6 @@ const Items = () => {
           className: `dragme ${index}`,
           draggable: "true",
           "data-item": index,
-          onChange: handleChange,
         });
       case "button":
         return createElement(
@@ -199,7 +200,7 @@ const Items = () => {
           },
           "Button"
         );
-      case "h2":
+      case "h1":
         return createElement(
           type,
           {
@@ -222,6 +223,13 @@ const Items = () => {
     <div className="main-container">
       <div style={{ width: "100%" }}>
         <h2>Tools</h2>
+        <button
+          style={{ width: "150px" }}
+          title="click to reset dropzone"
+          onClick={() => resetHandler()}
+        >
+          Reset
+        </button>
         <div className="side-panel">
           {items.map((item, index) => (
             <React.Fragment key={item.id}>

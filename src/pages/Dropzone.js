@@ -40,7 +40,7 @@ const Dropzone = ({ droppedItems }) => {
           },
           "Button"
         );
-      case "h2":
+      case "h1":
         return React.createElement(
           item.type,
           {
